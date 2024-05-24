@@ -1,1 +1,1 @@
-(All)[https://xuchp.github.io/all/]
+[All](https://xuchp.github.io/all/)
