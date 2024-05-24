@@ -1,1 +1,1 @@
-# xuchp.github.io
+https://xuchp.github.io/all/
