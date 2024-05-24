@@ -1,6 +1,6 @@
 /*
  * @Date: 2023-12-22 15:22:22
- * @LastEditTime: 2024-05-24 18:38:14
+ * @LastEditTime: 2024-05-24 19:30:47
  * @Description:
  * @FilePath: \xuchp.github.io\docs\.vitepress\config.mts
  */
@@ -26,7 +26,6 @@ export default defineConfig({
       SearchPlugin(options)
     ]
   },
-  base: '/notes/',
   title: '丶冫氵灬',
   description: 'blog',
   themeConfig: {
