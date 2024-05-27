@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-22 15:22:22
- * @LastEditTime: 2024-05-24 19:30:47
+ * @LastEditTime: 2024-05-27 10:30:15
  * @Description:
- * @FilePath: \xuchp.github.io\docs\.vitepress\config.mts
+ * @FilePath: /xuchp.github.io/docs/.vitepress/config.mts
  */
 import { defineConfig } from 'vitepress'
 import autoSidebar from 'amtf-vitepress-auto-sidebar'
@@ -41,7 +41,8 @@ export default defineConfig({
         text: '要点整理',
         items: [
           { text: 'Vue', link: '/InterviewVue/01.谈谈你对Vue的理解.md' },
-          { text: 'JavaScript', link: '/InterviewJS/js.md' }
+          { text: 'JavaScript', link: '/InterviewJS/js.md' },
+          { text: 'Node', link: '/node/1.如何理解node中模块的概念.md' }
         ]
       },
       {
