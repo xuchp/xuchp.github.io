@@ -7,7 +7,7 @@
 
 `Options`类型的`API`，数据、方法、计算属性等，是分散在：`data`、`methods`、`computed`中的，若想新增或者修改一个需求，就需要分别修改`data`、`methods`、`computed`，不便于维护和复用。
 
-![img](https://camo.githubusercontent.com/5fd56aa40236ed33534ce3c6d26db13725dc742f8381630e5103bf82aa5628e3/68747470733a2f2f67697465652e636f6d2f78756368702f7479706f72612d706963732f7261772f6d61737465722f696d616765732f32373736346164646134356135616133383863623866353561666661333137383833312d32303234303133303131343534393233392e676966)
+![img](https://github.com/xuchp/typora-pics/blob/main/images/27764adda45a5aa388cb8f55affa3178831-20240130114549239.gif)
 
 ### 2.拉开序幕的 setup
 
@@ -105,7 +105,7 @@ button {
 
 > 1. `ref`创建的变量必须使用`.value`（可以使用`volar`插件自动添加`.value`）。
 >
->    <img src="https://gitee.com/xuchp/typora-pics/raw/master/images/%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%85value.png" alt="自动补充value" style="zoom:50%;" />
+>    <img src="https://github.com/xuchp/typora-pics/blob/main/images/%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%85value.png" alt="自动补充value" style="zoom:50%;" />
 >
 > 2. `reactive`重新分配一个新对象，会**失去**响应式（可以使用`Object.assign`去整体替换）。
 
