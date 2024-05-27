@@ -7,7 +7,7 @@
 
 `Options`类型的`API`，数据、方法、计算属性等，是分散在：`data`、`methods`、`computed`中的，若想新增或者修改一个需求，就需要分别修改`data`、`methods`、`computed`，不便于维护和复用。
 
-![img](https://gitee.com/xuchp/typora-pics/raw/master/images/27764adda45a5aa388cb8f55affa3178831-20240130114549239.gif)
+![img](https://camo.githubusercontent.com/5fd56aa40236ed33534ce3c6d26db13725dc742f8381630e5103bf82aa5628e3/68747470733a2f2f67697465652e636f6d2f78756368702f7479706f72612d706963732f7261772f6d61737465722f696d616765732f32373736346164646134356135616133383863623866353561666661333137383833312d32303234303133303131343534393233392e676966)
 
 ### 2.拉开序幕的 setup
 
@@ -105,7 +105,7 @@ button {
 
 > 1. `ref`创建的变量必须使用`.value`（可以使用`volar`插件自动添加`.value`）。
 >
->    <img src="https://gitee.com/xuchp/typora-pics/raw/master/images/%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%85value.png" alt="自动补充value" style="zoom:50%;" /> 
+>    <img src="https://gitee.com/xuchp/typora-pics/raw/master/images/%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%85value.png" alt="自动补充value" style="zoom:50%;" />
 >
 > 2. `reactive`重新分配一个新对象，会**失去**响应式（可以使用`Object.assign`去整体替换）。
 
@@ -126,38 +126,36 @@ button {
   ```vue
   <template>
     <div class="person">
-      <h2>姓名：{{person.name}}</h2>
-      <h2>年龄：{{person.age}}</h2>
-      <h2>性别：{{person.gender}}</h2>
+      <h2>姓名：{{ person.name }}</h2>
+      <h2>年龄：{{ person.age }}</h2>
+      <h2>性别：{{ person.gender }}</h2>
       <button @click="changeName">修改名字</button>
       <button @click="changeAge">修改年龄</button>
       <button @click="changeGender">修改性别</button>
     </div>
   </template>
-  
+
   <script lang="ts" setup name="Person">
-    import {ref,reactive,toRefs,toRef} from 'vue'
-  
-    // 数据
-    let person = reactive({name:'张三', age:18, gender:'男'})
-  	
-    // 通过toRefs将person对象中的n个属性批量取出，且依然保持响应式的能力
-    let {name,gender} =  toRefs(person)
-  	
-    // 通过toRef将person对象中的gender属性取出，且依然保持响应式的能力
-    let age = toRef(person,'age')
-  
-    // 方法
-    function changeName(){
-      name.value += '~'
-    }
-    function changeAge(){
-      age.value += 1
-    }
-    function changeGender(){
-      gender.value = '女'
-    }
+  import { ref, reactive, toRefs, toRef } from 'vue'
+
+  // 数据
+  let person = reactive({ name: '张三', age: 18, gender: '男' })
+
+  // 通过toRefs将person对象中的n个属性批量取出，且依然保持响应式的能力
+  let { name, gender } = toRefs(person)
+
+  // 通过toRef将person对象中的gender属性取出，且依然保持响应式的能力
+  let age = toRef(person, 'age')
+
+  // 方法
+  function changeName() {
+    name.value += '~'
+  }
+  function changeAge() {
+    age.value += 1
+  }
+  function changeGender() {
+    gender.value = '女'
+  }
   </script>
   ```
-
-  
