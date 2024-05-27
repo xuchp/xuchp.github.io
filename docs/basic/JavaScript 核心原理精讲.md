@@ -205,7 +205,7 @@ I + undefined // NaN规则2，undefined转换数字相加NaN
 
 **实现浅拷贝的方法**
 
-1. **Object.assign()** 
+1. **Object.assign()**
 
    Object.assign() 是 ES6 中 Object 的一个方法，该方法可以用于 JS 对象的合并等多个用途，其中一个用途就是可以进行浅拷贝。
 
@@ -217,8 +217,8 @@ I + undefined // NaN规则2，undefined转换数字相加NaN
    Object.assign(target, source)
    console.log(target) // { a: { b: 10 } }
    source.a.b = 10
-   console.log(target);// { a: { b: 10 } }
-   console.log(source);// { a: { b: 10 } }
+   console.log(target) // { a: { b: 10 } }
+   console.log(source) // { a: { b: 10 } }
    ```
 
    **注意**
@@ -228,19 +228,19 @@ I + undefined // NaN规则2，undefined转换数字相加NaN
    3. 可以拷贝 Symbol 类型的属性
 
    ```js
-   let obj1 = { a: { b: 1 }, sym: Symbol(1) };
+   let obj1 = { a: { b: 1 }, sym: Symbol(1) }
    Object.defineProperty(obj1, 'innumerable', {
-       value: '不可枚举属性',
-       enumerable: false
+     value: '不可枚举属性',
+     enumerable: false
    })
    let obj2 = {}
    Object.assign(obj2, obj1)
-   obj1.a.b = 2;
-   console.log('obj1', obj1);
-   console.log('obj2', obj2);
+   obj1.a.b = 2
+   console.log('obj1', obj1)
+   console.log('obj2', obj2)
    ```
 
-   ![image-20240115102506908](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240115102506908.png)
+   ![image-20240115102506908](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240115102506908.png)
 
 2. **扩展运算符方式**
 
@@ -265,17 +265,17 @@ I + undefined // NaN规则2，undefined转换数字相加NaN
 
 ```js
 const shallowClone = (target) => {
-    if (typeof target === 'object' && target !== null) {
-        const cloneTarget = Array.isArray(target) ? [] : {}
-        for (let prop in target) {
-            if (target.hasOwnProperty(prop)) {
-                cloneTarget[prop] = target[prop]
-            }
-        }
-        return cloneTarget
-    } else {
-        return target
+  if (typeof target === 'object' && target !== null) {
+    const cloneTarget = Array.isArray(target) ? [] : {}
+    for (let prop in target) {
+      if (target.hasOwnProperty(prop)) {
+        cloneTarget[prop] = target[prop]
+      }
     }
+    return cloneTarget
+  } else {
+    return target
+  }
 }
 ```
 
@@ -301,28 +301,29 @@ const shallowClone = (target) => {
    2. 拷贝 Date 引用类型会变成字符串
    3. 无法拷贝不可枚举的属性
    4. 无法拷贝对象的原型链
-   5. 拷贝 RegExp引用类型会变成空对象
-   6. 对象中含有 NaN、Infinity以及 -Infinity，JSON 序列化的结果会变成 null
+   5. 拷贝 RegExp 引用类型会变成空对象
+   6. 对象中含有 NaN、Infinity 以及 -Infinity，JSON 序列化的结果会变成 null
    7. 无法拷贝对象的循环应用，即对象成环(obj[key] = obj)
 
 2. 基础版(手写递归实现)
 
    ```js
    let obj1 = { a: { b: 1 } }
-   function deepClone (obj) {
-       let cloneObj = {}
-       for (let key in obj) {// 遍历
-           if (typeof obj[key] === 'object') {
-               cloneObj[key] = deepClone(obj[key]) // 是对象就再次调用该函数递归
-           } else {
-               cloneObj[key] === obj[key] // 基本类型的话直接复制值
-           }
+   function deepClone(obj) {
+     let cloneObj = {}
+     for (let key in obj) {
+       // 遍历
+       if (typeof obj[key] === 'object') {
+         cloneObj[key] = deepClone(obj[key]) // 是对象就再次调用该函数递归
+       } else {
+         cloneObj[key] === obj[key] // 基本类型的话直接复制值
        }
-       return cloneObj
+     }
+     return cloneObj
    }
    let obj2 = deepClone(obj1)
    obj1.a.b = 2
-   console.log(obj2); // { a: { b: 1 } }
+   console.log(obj2) // { a: { b: 1 } }
    ```
 
    **注意**
@@ -339,55 +340,61 @@ const shallowClone = (target) => {
    4. 利用 WeakMap 类型作为 Hash 表，因为 WeakMap 是弱引用类型，可以有效防止内存泄漏，作为检测循环引用很有帮助，如果存在循环，则引用直接返回 WeakMap 存储的值
 
    ```js
-   const isComplexDataType = obj => (typeof obj === 'object' || typeof obj === 'function') && obj !== null
+   const isComplexDataType = (obj) =>
+     (typeof obj === 'object' || typeof obj === 'function') && obj !== null
    const deepClone = function (obj, hash = new WeakMap()) {
-       if (obj.constructor === Date) {
-           return new Date(obj)// 日期对象直接返回一个新的日期对象
-       }
-       if (obj.constructor === RegExp) {
-           return new RegExp(obj)// 正则对象直接返回一个新的正则对象
-       }
-       // 如果循环引用了就用 WeakMap 来解决
-       if (hash.has(obj)) {
-           return hash.get(obj)
-       }
-       let allDesc = Object.getOwnPropertyDescriptors(obj)
-       // 遍历传入参数所有键的特性
-       let cloneObj = Object.create(Object.getPrototypeOf(obj), allDesc)
-       // 继承原型链
-       hash.set(obj, cloneObj)
-       for (let key of Reflect.ownKeys(obj)) {
-           cloneObj[key] = (isComplexDataType(obj[key]) && typeof obj[key] !== 'function') ? deepClone(obj[key], hash) : obj[key]
-       }
-       return cloneObj
+     if (obj.constructor === Date) {
+       return new Date(obj) // 日期对象直接返回一个新的日期对象
+     }
+     if (obj.constructor === RegExp) {
+       return new RegExp(obj) // 正则对象直接返回一个新的正则对象
+     }
+     // 如果循环引用了就用 WeakMap 来解决
+     if (hash.has(obj)) {
+       return hash.get(obj)
+     }
+     let allDesc = Object.getOwnPropertyDescriptors(obj)
+     // 遍历传入参数所有键的特性
+     let cloneObj = Object.create(Object.getPrototypeOf(obj), allDesc)
+     // 继承原型链
+     hash.set(obj, cloneObj)
+     for (let key of Reflect.ownKeys(obj)) {
+       cloneObj[key] =
+         isComplexDataType(obj[key]) && typeof obj[key] !== 'function'
+           ? deepClone(obj[key], hash)
+           : obj[key]
+     }
+     return cloneObj
    }
    // 下面是验证代码
    let obj = {
-       num: 0,
-       str: '',
-       boolean: true,
-       unf: undefined,
-       nul: null,
-       obj: { name: '我是一个对象', id: 1 },
-       arr: [0, 1, 2],
-       func: function () {
-           console.log('我是一个函数');
-       },
-       date: new Date(0),
-       reg: new RegExp('/我是一个正则/ig'),
-       [Symbol('1')]: 1
+     num: 0,
+     str: '',
+     boolean: true,
+     unf: undefined,
+     nul: null,
+     obj: { name: '我是一个对象', id: 1 },
+     arr: [0, 1, 2],
+     func: function () {
+       console.log('我是一个函数')
+     },
+     date: new Date(0),
+     reg: new RegExp('/我是一个正则/ig'),
+     [Symbol('1')]: 1
    }
-   Object.defineProperty(obj, 'innumerable', { enumerable: false, value: '不可枚举的属性' })
+   Object.defineProperty(obj, 'innumerable', {
+     enumerable: false,
+     value: '不可枚举的属性'
+   })
    obj = Object.create(obj, Object.getOwnPropertyDescriptors(obj))
    obj.loop = obj // 设置 loop 成循环引用的属性
    let cloneObj = deepClone(obj)
    cloneObj.arr.push(4)
-   console.log('obj', obj);
-   console.log('cloneObj', cloneObj);
+   console.log('obj', obj)
+   console.log('cloneObj', cloneObj)
    ```
-   
 
-![image-20240116111129673](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240116111129673.png)
+![image-20240116111129673](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240116111129673.png)
 
 ### 继承
 
@@ -401,64 +408,64 @@ const shallowClone = (target) => {
 
 原型链继承是比较常见的继承方式之一，其中涉及的构造函数、原型和实例
 
- 	1. 每一个构造函数都有一个原型对象
- 	2. 原型对象又包含一个指向构造函数的指针
- 	3. 而实例则包含一个原型对象的指针
+1. 每一个构造函数都有一个原型对象
+2. 原型对象又包含一个指向构造函数的指针
+3. 而实例则包含一个原型对象的指针
 
 ```js
-function Parent1 () {
-    this.name = 'parent1'
-    this.play = [1, 2, 3]
+function Parent1() {
+  this.name = 'parent1'
+  this.play = [1, 2, 3]
 }
-function Child1 () {
-    this.type = 'child2'
+function Child1() {
+  this.type = 'child2'
 }
 Child1.prototype = new Parent1()
 
 var s1 = new Child1()
 var s2 = new Child1()
 s1.play.push(4)
-console.log(s1.play, s2.play);
+console.log(s1.play, s2.play)
 ```
 
-![image-20240117094112987](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094112987.png)
+![image-20240117094112987](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094112987.png)
 
 原型链继承内存空间是共享的，当一个发生变化的时候。另一个也随之进行变化
 
-**二、构造函数继承(借助call)**
+**二、构造函数继承(借助 call)**
 
 ```js
-function Parent1 () {
-    this.name = 'parent1'
+function Parent1() {
+  this.name = 'parent1'
 }
 Parent1.prototype.getName = function () {
-    return this.name
+  return this.name
 }
-function Child1 () {
-    Parent1.call(this)
-    this.type = 'Child1'
+function Child1() {
+  Parent1.call(this)
+  this.type = 'Child1'
 }
 let child = new Child1()
-console.log(child); // 没问题
-console.log(child.getName()); // 会报错
+console.log(child) // 没问题
+console.log(child.getName()) // 会报错
 ```
 
-![image-20240117094152565](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094152565.png)
+![image-20240117094152565](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094152565.png)
 
 **三、组合继承(前两中组合)**
 
 ```js
-function Parent3 () {
-    this.name = 'parent3'
-    this.play = [1, 2, 3]
+function Parent3() {
+  this.name = 'parent3'
+  this.play = [1, 2, 3]
 }
 Parent3.prototype.getName = function () {
-    return this.name
+  return this.name
 }
-function Child3 () {
-    // 第二次调用Parent3
-    Parent3.call(this)
-    this.type = 'Child3'
+function Child3() {
+  // 第二次调用Parent3
+  Parent3.call(this)
+  this.type = 'Child3'
 }
 // 第一次调用Parent3
 Child3.prototype = new Parent3()
@@ -468,12 +475,12 @@ Child3.prototype.constructor = Child3
 let s3 = new Child3()
 let s4 = new Child3()
 s3.play.push(4)
-console.log(s3.play, s4.play); // 互不影响
-console.log(s3.getName()); // 正常输出'parent3'
-console.log(s4.getName()); // 正常输出'parent3'
+console.log(s3.play, s4.play) // 互不影响
+console.log(s3.getName()) // 正常输出'parent3'
+console.log(s4.getName()) // 正常输出'parent3'
 ```
 
-![image-20240117094228124](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094228124.png)
+![image-20240117094228124](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094228124.png)
 
 **四、原型式继承**
 
@@ -483,12 +490,12 @@ console.log(s4.getName()); // 正常输出'parent3'
 
 ```js
 let parent4 = {
-    name: 'parent4',
-    friends: ['p1', 'p2', 'p3'],
-    getName: function () {
-        return this.name
-    }
-};
+  name: 'parent4',
+  friends: ['p1', 'p2', 'p3'],
+  getName: function () {
+    return this.name
+  }
+}
 let person4 = Object.create(parent4)
 person4.name = 'tom'
 person4.friends.push('jerry')
@@ -496,14 +503,17 @@ person4.friends.push('jerry')
 let person5 = Object.create(parent4)
 person5.friends.push('lucy')
 
-console.log('person4.name', person4.name);
-console.log('person4.name === person4.getName()', person4.name === person4.getName());
-console.log('person5.name', person5.name);
-console.log('person4.friends', person4.friends);
-console.log('person5.friends', person5.friends);
+console.log('person4.name', person4.name)
+console.log(
+  'person4.name === person4.getName()',
+  person4.name === person4.getName()
+)
+console.log('person5.name', person5.name)
+console.log('person4.friends', person4.friends)
+console.log('person5.friends', person5.friends)
 ```
 
-![image-20240117094250912](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094250912.png)
+![image-20240117094250912](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094250912.png)
 
 **五、寄生式继承**
 
@@ -513,104 +523,104 @@ console.log('person5.friends', person5.friends);
 
 ```js
 let parent5 = {
-    name: 'parent5',
-    friends: ['p1', 'p2', 'p3'],
-    getName: function () {
-        return this.name
-    }
-};
-function clone (original) {
-    let clone = Object.create(original)
-    clone.getFriends = function () {
-        return this.friends
-    }
-    return clone
+  name: 'parent5',
+  friends: ['p1', 'p2', 'p3'],
+  getName: function () {
+    return this.name
+  }
+}
+function clone(original) {
+  let clone = Object.create(original)
+  clone.getFriends = function () {
+    return this.friends
+  }
+  return clone
 }
 let person5 = clone(parent5)
-console.log(person5.getName());
-console.log(person5.getFriends());
+console.log(person5.getName())
+console.log(person5.getFriends())
 ```
 
-![image-20240117094316990](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094316990.png)
+![image-20240117094316990](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094316990.png)
 
 **六、寄生组合式继承**
 
 在前面这几种继承方式的优缺点基础上进行改造，得出了寄生组合式的继承方法，这也是所有继承方式里面相对最优的继承方式
 
 ```js
-function clone (parent, child) {
-    // 这里改用 Object.create 就可以减少组合继承中多进行一次构造的过程
-    child.prototype = Object.create(parent.prototype)
-    child.prototype.constructor = child
+function clone(parent, child) {
+  // 这里改用 Object.create 就可以减少组合继承中多进行一次构造的过程
+  child.prototype = Object.create(parent.prototype)
+  child.prototype.constructor = child
 }
 
-function Parent6 () {
-    this.name = 'parent6'
-    this.play = [1, 2, 3]
+function Parent6() {
+  this.name = 'parent6'
+  this.play = [1, 2, 3]
 }
 Parent6.prototype.getName = function () {
-    return this.name
+  return this.name
 }
-function Child6 () {
-    Parent6.call(this)
-    this.friends = 'child5'
+function Child6() {
+  Parent6.call(this)
+  this.friends = 'child5'
 }
 clone(Parent6, Child6)
 
 Child6.prototype.getFriends = function () {
-    return this.friends
+  return this.friends
 }
 let person6 = new Child6()
-console.log(person6);
-console.log(person6.getName());
-console.log(person6.getFriends());
+console.log(person6)
+console.log(person6.getName())
+console.log(person6.getFriends())
 ```
 
-![image-20240117094338932](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117094338932.png)
+![image-20240117094338932](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117094338932.png)
 
-**七、ES6的extends关键字实现逻辑**
+**七、ES6 的 extends 关键字实现逻辑**
 
-使用关键词很容易直接实现JavaScript的继承，但是如果想深入了解extends语法糖是怎么实现的，就得深入研究extends的底层逻辑
+使用关键词很容易直接实现 JavaScript 的继承，但是如果想深入了解 extends 语法糖是怎么实现的，就得深入研究 extends 的底层逻辑
 
 ```js
 class Person {
-    constructor(name) {
-        this.name = name
-    }
-    // 原型方法
-    // 即Person.prototype.getName = function(){}
-    // 下面可以简写为getName(){...}
-    getName = function () {
-        console.log('Person:', this.name);
-    }
+  constructor(name) {
+    this.name = name
+  }
+  // 原型方法
+  // 即Person.prototype.getName = function(){}
+  // 下面可以简写为getName(){...}
+  getName = function () {
+    console.log('Person:', this.name)
+  }
 }
 class Gamer extends Person {
-    constructor(name, age) {
-        // 子类中存在构造函数，则需要再使用“this”之前首先调用super()
-        super(name)
-        this.age = age
-    }
+  constructor(name, age) {
+    // 子类中存在构造函数，则需要再使用“this”之前首先调用super()
+    super(name)
+    this.age = age
+  }
 }
 const asuna = new Gamer('Asuna', 20)
 asuna.getName() // 成功访问到父类的方法
 ```
 
-#### 如何实现new、apply、call、bind的底层逻辑
+#### 如何实现 new、apply、call、bind 的底层逻辑
 
-JavaScript中的apply、call和bind方法是前端代码开发中相当重要的概念，并且与this的指向密切相关
+JavaScript 中的 apply、call 和 bind 方法是前端代码开发中相当重要的概念，并且与 this 的指向密切相关
 
-**new原理介绍**
+**new 原理介绍**
 
 new 关键词的主要作用，就是指向一个构造函数，返回一个实例对象。根据构造函数的情况，来确定是否可以接受参数的传递
 
 **new 执行过程**
 
 1. 创建一个新对象
-2. 将构造函数的作用域赋给新对象(this指向新对象)
+2. 将构造函数的作用域赋给新对象(this 指向新对象)
 3. 执行构造函数中的代码(为这个新对象添加属性)
 4. 返回新对象
 
-new 关键词执行之后总是会返回一个对象，要么是实例对象，要么是return语句指定的对象
+new 关键词执行之后总是会返回一个对象，要么是实例对象，要么是 return 语句指定的对象
 
 **new 被调用后大致做了哪几件事情**
 
@@ -621,22 +631,22 @@ new 关键词执行之后总是会返回一个对象，要么是实例对象，�
 **new 的实现**
 
 ```js
-function _new (ctor, ...args) {
-    if (typeof ctor !== 'function') {
-        throw 'ctor must be a function'
-    }
-    let obj = new Object()
-    obj.__proto__ = Object.create(ctor.prototype)
-    let res = ctor.apply(obj, ...args)
-    let isObject = typeof res === 'object' && typeof res !== null
-    let isFunction = typeof res === 'function'
-    return isObject || isFunction ? res : obj
+function _new(ctor, ...args) {
+  if (typeof ctor !== 'function') {
+    throw 'ctor must be a function'
+  }
+  let obj = new Object()
+  obj.__proto__ = Object.create(ctor.prototype)
+  let res = ctor.apply(obj, ...args)
+  let isObject = typeof res === 'object' && typeof res !== null
+  let isFunction = typeof res === 'function'
+  return isObject || isFunction ? res : obj
 }
 ```
 
-**apply&call&bind原理介绍**
+**apply&call&bind 原理介绍**
 
-call、apply、bind是挂在 Function 对象上的个方法，调用这三个方法的必须是一个函数
+call、apply、bind 是挂在 Function 对象上的个方法，调用这三个方法的必须是一个函数
 
 ```js
 func.call(thisArg, param1, param2,...)
@@ -655,7 +665,7 @@ func.bind(thisArg, param1, param2,...)
 | 方法参数  | 多个              | 单个数组          |       多个        |
 | 方法功能  | 函数调用改变 this | 函数调用改变 this | 函数调用改变 this |
 | 返回结果  | 直接执行的        | 直接执行          | 返回待执行的函数  |
-| 底层实现  | 通过eval          | 通过eval          |  间接调用 apply   |
+| 底层实现  | 通过 eval         | 通过 eval         |  间接调用 apply   |
 
 ### 闭包
 
@@ -675,7 +685,7 @@ func.bind(thisArg, param1, param2,...)
 
 **作用域链的基本概念：** 当访问一个变量时，代码解释器会首先在当前的作用域查找，如果没找到，就去腹肌作用域查找，直到找到该变量或者不存在父级作用域中。
 
-闭包产生的本质就是当前环境中存在指向父级作用域的引用   
+闭包产生的本质就是当前环境中存在指向父级作用域的引用
 
 #### 闭包的表现形式
 
@@ -708,7 +718,7 @@ Array 构造器用于创建一个新的数组，通常推荐使用对象字面�
 
 **new Array**
 
-`new Array(arg1,arg2...)`参数长度为0 或长度大于等于 2 时，传入的参数将按照顺序依次成为新数组的第 0 至第 N 项(参数长度为 0 时，返回空数组)
+`new Array(arg1,arg2...)`参数长度为 0 或长度大于等于 2 时，传入的参数将按照顺序依次成为新数组的第 0 至第 N 项(参数长度为 0 时，返回空数组)
 
 `new Array(len)`当 len 不是数值时，处理同上，返回一个只包含 len 元素一项的数组；当 len 为数值时，len 最大不能超过 32 位无符号整型，即需要小于 2 的 32 次方(len 最大为 `Math.pow(2, 32)`)，否则将抛出 `RangeError`
 
@@ -728,14 +738,18 @@ Array 构造器用于创建一个新的数组，通常推荐使用对象字面�
 
 ```js
 var obj = { 0: 'a', 1: 'b', 2: 'c', length: 3 }
-var arr = Array.from(obj, function (value, index) {
-    console.log(value, index, this, arguments.length);
-    return value.repeat(3)// 必须指定返回值,否则返回 undefined
-}, obj)
-console.log(arr);
+var arr = Array.from(
+  obj,
+  function (value, index) {
+    console.log(value, index, this, arguments.length)
+    return value.repeat(3) // 必须指定返回值,否则返回 undefined
+  },
+  obj
+)
+console.log(arr)
 ```
 
-![image-20240117112411958](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117112411958.png)
+![image-20240117112411958](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117112411958.png)
 
 #### Array 的判断
 
@@ -745,7 +759,7 @@ console.log(arr);
 
 #### Array 的方法
 
-**改变自身的方法：** pop、push、reverse、shift、sort、splice、unshift、以及两个 ES6 新增的方法 copyWithin和 fill
+**改变自身的方法：** pop、push、reverse、shift、sort、splice、unshift、以及两个 ES6 新增的方法 copyWithin 和 fill
 
 **不改变自身的方法：** concat、join、slice、toString、toLocalString、indexOf、lastIndexOf、未形成标准的 toSource、以及 ES7 新增的方法 includes
 
@@ -763,59 +777,59 @@ console.log(arr);
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   
-   function flatten (arr) {
-       let result = []
-   
-       for (let i = 0; i < arr.length; i++) {
-           if (Array.isArray(arr[i])) {
-               result = result.concat(flatten(arr[i]))
-           } else {
-               result.push(arr[i])
-           }
+
+   function flatten(arr) {
+     let result = []
+
+     for (let i = 0; i < arr.length; i++) {
+       if (Array.isArray(arr[i])) {
+         result = result.concat(flatten(arr[i]))
+       } else {
+         result.push(arr[i])
        }
-       return result
+     }
+     return result
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
-   ![image-20240117153246144](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117153246144.png)
+   ![image-20240117153246144](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117153246144.png)
 
 2. 利用 reduce 函数迭代
 
-   从上面普通的递归函数中可以看出，其实就是对数组的每一项进行处理，其实也可以用reduce 来实现数组的拼接，从而简化第一种方法的代码
+   从上面普通的递归函数中可以看出，其实就是对数组的每一项进行处理，其实也可以用 reduce 来实现数组的拼接，从而简化第一种方法的代码
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   function flatten (arr) {
-       return arr.reduce(function (prev, next) {
-           return prev.concat(Array.isArray(next) ? flatten(next) : next)
-       }, [])
+   function flatten(arr) {
+     return arr.reduce(function (prev, next) {
+       return prev.concat(Array.isArray(next) ? flatten(next) : next)
+     }, [])
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
 3. 扩展运算符实现
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   function flatten (arr) {
-       while (arr.some(item => Array.isArray(item))) {
-           arr = [].concat(...arr)
-       }
-       return arr
+   function flatten(arr) {
+     while (arr.some((item) => Array.isArray(item))) {
+       arr = [].concat(...arr)
+     }
+     return arr
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
 4. split 和 toString 共同处理
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   function flatten (arr) {
-       return arr.toString().split(',')
+   function flatten(arr) {
+     return arr.toString().split(',')
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
 5. 调用 ES6 中的 flat
@@ -826,23 +840,23 @@ console.log(arr);
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   function flatten (arr) {
-       return arr.flat(Infinity)
+   function flatten(arr) {
+     return arr.flat(Infinity)
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
 6. 正则和 JSON 方法共同处理
 
    ```js
    var a = [1, [2, [3, 4, 5]]]
-   function flatten (arr) {
-       let str = JSON.stringify(arr)
-       str = str.replace(/(\[|\])/g, '')
-       str = '[' + str + ']'
-       return JSON.parse(str)
+   function flatten(arr) {
+     let str = JSON.stringify(arr)
+     str = str.replace(/(\[|\])/g, '')
+     str = '[' + str + ']'
+     return JSON.parse(str)
    }
-   console.log(flatten(a));
+   console.log(flatten(a))
    ```
 
    ### 数组排序
@@ -855,29 +869,31 @@ console.log(arr);
 
    **比较类排序：** 通过比较来决定元素之间的相对次序，其时间复杂度不能突破 O(nlogn)，因此也成为非线性时间比较类排序。
 
-   **非比较类排序：** 不通过比较来决定元素之间的相对次序，它可以突破基于比较排序的时间下界，以线性时间运行，因此也称为线性时间非比较类排序。 ![image-20240117155801276](https://gitee.com/xuchp/typora-pics/raw/master/images/image-20240117155801276.png)
+   **非比较类排序：** 不通过比较来决定元素之间的相对次序，它可以突破基于比较排序的时间下界，以线性时间运行，因此也称为线性时间非比较类排序。 ![image-20240117155801276](https://raw.githubusercontent.com/xuchp/typora-pics/main/images/image-20240117155801276.png)
 
 **冒泡排序**
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
 
-function bubbleSort (array) {
-    const len = array.length
-    if (len < 2) { return array }
-    for (let i = 0; i < len; i++) {
-        for (let j = 0; j < i; j++) {
-            if (array[j] > array[i]) {
-                const temp = array[j]
-                array[j] = array[i]
-                array[i] = temp
-            }
-        }
-    }
+function bubbleSort(array) {
+  const len = array.length
+  if (len < 2) {
     return array
+  }
+  for (let i = 0; i < len; i++) {
+    for (let j = 0; j < i; j++) {
+      if (array[j] > array[i]) {
+        const temp = array[j]
+        array[j] = array[i]
+        array[i] = temp
+      }
+    }
+  }
+  return array
 }
 
-console.log(bubbleSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(bubbleSort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 **快速排序**
@@ -886,27 +902,27 @@ console.log(bubbleSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
-function quickSort (array) {
-    var quick = function (arr) {
-        if (arr.length <= 1) return arr
-        const len = arr.length
-        const index = Math.floor(len >> 1)
-        const pivot = arr.splice(index, 1)[0]
-        const left = []
-        const right = []
-        for (let i = 0; i < len; i++) {
-            if (arr[i] > pivot) {
-                right.push(arr[i])
-            } else if (arr[i] <= pivot) {
-                left.push(arr[i])
-            }
-        }
-        return quick(left).concat([pivot], quick(right))
+function quickSort(array) {
+  var quick = function (arr) {
+    if (arr.length <= 1) return arr
+    const len = arr.length
+    const index = Math.floor(len >> 1)
+    const pivot = arr.splice(index, 1)[0]
+    const left = []
+    const right = []
+    for (let i = 0; i < len; i++) {
+      if (arr[i] > pivot) {
+        right.push(arr[i])
+      } else if (arr[i] <= pivot) {
+        left.push(arr[i])
+      }
     }
-    const result = quick(array)
-    return result
+    return quick(left).concat([pivot], quick(right))
+  }
+  const result = quick(array)
+  return result
 }
-console.log(quickSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(quickSort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 **插入排序**
@@ -915,23 +931,23 @@ console.log(quickSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
-function insertSort (array) {
-    const len = array.length
-    let current
-    let prev
-    for (let i = 1; i < len; i++) {
-        current = array[i]
-        prev = i - 1
-        while (prev >= 0 && array[prev] > current) {
-            array[prev + 1] = array[prev]
-            prev--
-        }
-        array[prev + 1] = current
+function insertSort(array) {
+  const len = array.length
+  let current
+  let prev
+  for (let i = 1; i < len; i++) {
+    current = array[i]
+    prev = i - 1
+    while (prev >= 0 && array[prev] > current) {
+      array[prev + 1] = array[prev]
+      prev--
     }
-    return array
+    array[prev + 1] = current
+  }
+  return array
 }
 
-console.log(insertSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(insertSort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 **选择排序**
@@ -940,25 +956,25 @@ console.log(insertSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
-function selectSort (array) {
-    const len = array.length
-    let temp
-    let minIndex
-    for (let i = 0; i < len - 1; i++) {
-        minIndex = i
-        for (let j = i; j < len; j++) {
-            if (array[j] <= array[minIndex]) {
-                minIndex = j
-            }
-        }
-        temp = array[i]
-        array[i] = array[minIndex]
-        array[minIndex] = temp
+function selectSort(array) {
+  const len = array.length
+  let temp
+  let minIndex
+  for (let i = 0; i < len - 1; i++) {
+    minIndex = i
+    for (let j = i; j < len; j++) {
+      if (array[j] <= array[minIndex]) {
+        minIndex = j
+      }
     }
-    return array
+    temp = array[i]
+    array[i] = array[minIndex]
+    array[minIndex] = temp
+  }
+  return array
 }
 
-console.log(selectSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(selectSort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 **堆排序**
@@ -971,39 +987,39 @@ console.log(selectSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
-function heap_sort (arr) {
-    var len = arr.length
-    var k = 0
+function heap_sort(arr) {
+  var len = arr.length
+  var k = 0
 
-    function swap (i, j) {
-        var temp = arr[i]
-        arr[i] = arr[j]
-        arr[j] = temp
+  function swap(i, j) {
+    var temp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = temp
+  }
+  function max_heapify(start, end) {
+    var dad = start
+    var son = dad * 2 + 1
+    if (son >= end) return
+    if (son + 1 < end && arr[son] < arr[son + 1]) {
+      son++
     }
-    function max_heapify (start, end) {
-        var dad = start
-        var son = dad * 2 + 1
-        if (son >= end) return
-        if (son + 1 < end && arr[son] < arr[son + 1]) {
-            son++
-        }
-        if (arr[dad] <= arr[son]) {
-            swap(dad, son)
-            max_heapify(son, end)
-        }
+    if (arr[dad] <= arr[son]) {
+      swap(dad, son)
+      max_heapify(son, end)
     }
+  }
 
-    for (var i = Math.floor(len / 2) - 1; i >= 0; i--) {
-        max_heapify(i, len)
-    }
-    for (var j = len - 1; j > k; j--) {
-        swap(0, j)
-        max_heapify(0, j)
-    }
-    return arr
+  for (var i = Math.floor(len / 2) - 1; i >= 0; i--) {
+    max_heapify(i, len)
+  }
+  for (var j = len - 1; j > k; j--) {
+    swap(0, j)
+    max_heapify(0, j)
+  }
+  return arr
 }
 
-console.log(heap_sort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(heap_sort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 **归并排序**
@@ -1016,38 +1032,40 @@ console.log(heap_sort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 
 ```js
 var a = [1, 3, 6, 3, 34, 76, 1, 34, 222, 6, 456, 211]
-function mergeSort (array) {
-    const merge = (right, left) => {
-        const result = []
-        let il = 0
-        let ir = 0
-        while (il < left.length && ir < right.length) {
-            if (left[il] < right[ir]) {
-                result.push(left[il++])
-            } else {
-                result.push(right[ir++])
-            }
-        }
-        while (il < left.length) {
-            result.push(left[il++])
-        }
-        while (ir < right.length) {
-            result.push(right[ir++])
-        }
-        return result
+function mergeSort(array) {
+  const merge = (right, left) => {
+    const result = []
+    let il = 0
+    let ir = 0
+    while (il < left.length && ir < right.length) {
+      if (left[il] < right[ir]) {
+        result.push(left[il++])
+      } else {
+        result.push(right[ir++])
+      }
     }
+    while (il < left.length) {
+      result.push(left[il++])
+    }
+    while (ir < right.length) {
+      result.push(right[ir++])
+    }
+    return result
+  }
 
-    const mergeSort = array => {
-        if (array.length === 1) { return array }
-        const mid = Math.floor(array.length / 2)
-        const left = array.slice(0, mid)
-        const right = array.slice(mid, array.length)
-        return merge(mergeSort(left), mergeSort(right))
+  const mergeSort = (array) => {
+    if (array.length === 1) {
+      return array
     }
-    return mergeSort(array)
+    const mid = Math.floor(array.length / 2)
+    const left = array.slice(0, mid)
+    const right = array.slice(mid, array.length)
+    return merge(mergeSort(left), mergeSort(right))
+  }
+  return mergeSort(array)
 }
 
-console.log(mergeSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
+console.log(mergeSort(a)) // [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 ```
 
 | 排序算法 | 时间复杂度 | 空间复杂度 | 稳定性 |
@@ -1059,7 +1077,7 @@ console.log(mergeSort(a))// [1, 1, 3, 3, 6, 6, 34, 34, 76, 211, 222, 456]
 |  堆排序  | O(n logn)  |    O(1)    | 不稳定 |
 | 归并排序 | O(n logn)  |    O(n)    |  稳定  |
 
-#### sort排序
+#### sort 排序
 
 通过 sort 方法也可以实现数组的排序，默认排序顺序是先将元素转换为字符串，然后再进行排序
 
