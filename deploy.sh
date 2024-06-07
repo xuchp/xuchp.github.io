@@ -1,6 +1,6 @@
 ###
  # @Date: 2024-05-27 10:28:07
- # @LastEditTime: 2024-06-07 11:11:54
+ # @LastEditTime: 2024-06-07 11:13:30
  # @Description: 
  # @FilePath: /xuchp.github.io/deploy.sh
 ### 
@@ -18,4 +18,4 @@ git add .
 
 git commit -m "$commitMsg"
 
-git push origin master
+git push 
