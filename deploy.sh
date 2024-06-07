@@ -1,11 +1,10 @@
-#!usr/bin/env sh
-###
- # @Date: 2023-12-22 20:22:07
- # @LastEditTime: 2024-01-16 19:15:36
- # @Description: 
- # @FilePath: \undefinedc:\code\xuchp\deploy.sh
-### 
 
+###
+ # @Date: 2024-05-27 10:28:07
+ # @LastEditTime: 2024-06-07 11:08:27
+ # @Description: 
+ # @FilePath: /xuchp.github.io/deploy.sh
+### 
 # 忽略错误
 set -e
 

@@ -1,10 +1,10 @@
 ### Pinia 缓存持久化
 
-#### 一、安装pinia-plugin-persistedstate
+#### 一、安装 pinia-plugin-persistedstate
 
 - **pnpm** : `pnpm i pinia-plugin-persistedstate`
-- npm : `npm i pinia-plugin-persistedstate`
-- yarn : `yarn add pinia-plugin-persistedstate`
+- **npm** : `npm i pinia-plugin-persistedstate`
+- **yarn** : `yarn add pinia-plugin-persistedstate`
 
 #### 二、在 main.ts 中添加
 
@@ -18,7 +18,7 @@ pinia.use(piniaPluginPersistedstate)
 
 #### 三、在仓库中添加配置项
 
-defineStore的第二个参数中配置`{persist:true}`来开启数据持久化
+defineStore 的第二个参数中配置`{persist:true}`来开启数据持久化
 
 ```typescript
 import { defineStore } from 'pinia'
@@ -26,10 +26,10 @@ import { defineStore } from 'pinia'
 export const useStore = defineStore('store', {
   state: () => {
     return {
-      someState: 'hello pinia',
+      someState: 'hello pinia'
     }
   },
-  persist: true,
+  persist: true
 })
 ```
 
@@ -49,11 +49,11 @@ import { defineStore } from 'pinia'
 
 export const useStore = defineStore('main', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
     // 在这里进行自定义配置
-  },
+  }
 })
 ```
 
@@ -69,11 +69,11 @@ import { defineStore } from 'pinia'
 
 export const useStore = defineStore('store', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
-    key: 'my-custom-key',
-  },
+    key: 'my-custom-key'
+  }
 })
 ```
 
@@ -91,11 +91,11 @@ import { defineStore } from 'pinia'
 
 export const useStore = defineStore('store', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
-    storage: sessionStorage,
-  },
+    storage: sessionStorage
+  }
 })
 ```
 
@@ -117,13 +117,13 @@ export const useStore = defineStore('store', {
   state: () => ({
     save: {
       me: 'saved',
-      notMe: 'not-saved',
+      notMe: 'not-saved'
     },
-    saveMeToo: 'saved',
+    saveMeToo: 'saved'
   }),
   persist: {
-    paths: ['save.me', 'saveMeToo'],
-  },
+    paths: ['save.me', 'saveMeToo']
+  }
 })
 ```
 
@@ -142,14 +142,14 @@ import { parse, stringify } from 'zipson'
 
 export const useStore = defineStore('store', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
     serializer: {
       deserialize: parse,
-      serialize: stringify,
-    },
-  },
+      serialize: stringify
+    }
+  }
 })
 ```
 
@@ -167,13 +167,13 @@ import { defineStore } from 'pinia'
 
 export const useStore = defineStore('store', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
     beforeRestore: (ctx) => {
       console.log(`即将恢复 '${ctx.store.$id}'`)
-    },
-  },
+    }
+  }
 })
 ```
 
@@ -195,13 +195,13 @@ import { defineStore } from 'pinia'
 
 export const useStore = defineStore('store', {
   state: () => ({
-    someState: '你好 pinia',
+    someState: '你好 pinia'
   }),
   persist: {
     afterRestore: (ctx) => {
       console.log(`刚刚恢复完 '${ctx.store.$id}'`)
-    },
-  },
+    }
+  }
 })
 ```
 
