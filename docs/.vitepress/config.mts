@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-22 15:22:22
- * @LastEditTime: 2024-05-27 10:30:15
+ * @LastEditTime: 2024-06-18 10:45:45
  * @Description:
- * @FilePath: /xuchp.github.io/docs/.vitepress/config.mts
+ * @FilePath: /undefined/Users/xuchengpeng/Desktop/xuchp.github.io/docs/.vitepress/config.mts
  */
 import { defineConfig } from 'vitepress'
 import autoSidebar from 'amtf-vitepress-auto-sidebar'
@@ -45,7 +45,7 @@ export default defineConfig({
           { text: 'Node', link: '/node/1.如何理解node中模块的概念.md' },
           {
             text: 'TypeScript',
-            link: '/TypeScript/1.开篇：用正确的方式学习 TypeScript.md'
+            link: '/TypeScript/01.开篇：用正确的方式学习 TypeScript.md'
           }
         ]
       },
