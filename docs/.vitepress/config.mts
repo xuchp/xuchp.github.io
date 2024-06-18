@@ -42,7 +42,11 @@ export default defineConfig({
         items: [
           { text: 'Vue', link: '/InterviewVue/01.谈谈你对Vue的理解.md' },
           { text: 'JavaScript', link: '/InterviewJS/js.md' },
-          { text: 'Node', link: '/node/1.如何理解node中模块的概念.md' }
+          { text: 'Node', link: '/node/1.如何理解node中模块的概念.md' },
+          {
+            text: 'TypeScript',
+            link: '/TypeScript/1.开篇：用正确的方式学习 TypeScript.md'
+          }
         ]
       },
       {
